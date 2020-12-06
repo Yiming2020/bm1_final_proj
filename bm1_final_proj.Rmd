@@ -22,3 +22,63 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
+
+```{r, echo = F, message = FALSE, warning=FALSE}
+rm(list = ls())
+library(arsenal)
+library(dplyr)
+library(ggplot2)
+# Data input
+crimes<-read.csv("HateCrimes.csv")
+str(crimes)
+# Data format transformation
+crimes$unemployment<- as.factor(crimes$unemployment)
+crimes$urbanization<- as.factor(crimes$urbanization)
+crimes$hate_crimes_per_100k_splc<-as.numeric(crimes$hate_crimes_per_100k_splc)
+str(crimes)
+```
+
+## Descriptive statistics+Graphs
+```{r, echo = F, message = FALSE, warning=FALSE}
+# Descriptive Characteristics of study sample
+labels1 <- list(hate_crimes_per_100k_splc = "Hate crime rate per 100k population", unemployment = "Level of state unemployment", urbanization="Level of state urbanization", median_household_income="Median household income per state",perc_population_with_high_school_degree="Percentage of adults (>25 yrs) with a high school degree",perc_non_citizen="Percentage of population that are not US citizens",gini_index="Gini index",perc_non_white="Percentage of population that are non-white")
+
+controls1 <- tableby.control(total = T,test=F, numeric.stats = c("meansd", "median", "iqr","range", "Nmiss2"),cat.stats = c("countpct", "Nmiss2"),stats.labels = list(meansd = "Mean/SD",median = "Median",iqr="IQR",range = "Min - Max",Nmiss2 = "Missing",countpct = "N (%)"),digits = 2L,digits.count = 0L)
+tb1<-tableby(~hate_crimes_per_100k_splc+unemployment+urbanization+median_household_income+perc_population_with_high_school_degree+perc_non_citizen+gini_index+perc_non_white,data=crimes,control = controls1)
+summary(tb1, title = "Descriptive Characteristics of Study Sample, Hate Crimes Occurring in the United States (By State)", labelTranslations = labels1, text=T)
+
+# Histogram of the outcome distribution
+mytheme <- theme_bw() + theme(plot.title=element_text(hjust=0.5),axis.title=element_text(size=rel(1)),axis.text=element_text(size=rel(1)),legend.position = "top")
+ggplot(data=crimes,aes(x=hate_crimes_per_100k_splc))+
+geom_histogram(fill="lightblue",color="darkblue",linetype="dashed",alpha=0.5) +
+labs(title="Histogram of Hate Crimes Rate Per 100k Population in United States",x="Hate Crimes Rate (Per 100 K Population)", y = "Count")+mytheme
+## District of columbia might be a outlier
+```
+
+## Varible Selection
+```{r, echo = F, message = FALSE, warning=FALSE}
+# Correlation matrix
+library("corrplot")
+matrix1<-cor(crimes[,-c(1:3)],use="complete.obs")
+matrix1 %>% 
+    corrplot::corrplot(
+    method = "square",
+    type = "lower",
+    addCoef.col = "black", 
+    diag = T,
+    tl.cex = 0.5
+  )
+round(matrix1,2) # Cor(non-white and non-citizen): 0.75; cor(income and > high school degree):0.65
+
+```
+
+## Model building
+```{r}
+# Varibale Selection- Stepwise
+res1 <- lm(hate_crimes_per_100k_splc ~ unemployment + urbanization + 
+             median_household_income + perc_population_with_high_school_degree +
+             perc_non_citizen + gini_index + perc_non_citizen , data=crimes)
+
+summary(res1)
+```
+
