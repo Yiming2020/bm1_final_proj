@@ -33,9 +33,14 @@ scale_fill_discrete = scale_fill_viridis_d
 crimes<-read.csv("HateCrimes.csv") %>% 
   drop_na()
 # Data format transformation
-crimes$unemployment<- as.factor(crimes$unemployment)
-crimes$urbanization<- as.factor(crimes$urbanization)
-crimes$hate_crimes_per_100k_splc<-as.numeric(crimes$hate_crimes_per_100k_splc)
+crimes = 
+  crimes %>% 
+  mutate(
+    unemployment = as.factor(unemployment),
+    unemployment = fct_relevel(unemployment, "low", "high"),
+    urbanization = as.factor(urbanization),
+    urbanization = fct_relevel(urbanization, "low", "high"),
+    hate_crimes_per_100k_splc = as.numeric(crimes$hate_crimes_per_100k_splc))
 str(crimes)
 ```
 
