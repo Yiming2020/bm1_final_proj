@@ -5,6 +5,11 @@ output: github_document
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+rm(list = ls())
+library(arsenal)
+library(dplyr)
+library(ggplot2)
+library(HH)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -24,13 +29,9 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ```{r, echo = F, message = FALSE, warning=FALSE}
-rm(list = ls())
-library(arsenal)
-library(dplyr)
-library(ggplot2)
 # Data input
-crimes<-read.csv("HateCrimes.csv")
-str(crimes)
+crimes<-read.csv("HateCrimes.csv") %>% 
+  drop_na()
 # Data format transformation
 crimes$unemployment<- as.factor(crimes$unemployment)
 crimes$urbanization<- as.factor(crimes$urbanization)
@@ -72,13 +73,71 @@ round(matrix1,2) # Cor(non-white and non-citizen): 0.75; cor(income and > high s
 
 ```
 
+median_household_income and perc_population_with_high_school_degree may highly correlated.
+perc_non_white and perc_non_cizen may highly correlated.
+
+
+
+
 ## Model building
 ```{r}
 # Varibale Selection- Stepwise
-res1 <- lm(hate_crimes_per_100k_splc ~ unemployment + urbanization + 
-             median_household_income + perc_population_with_high_school_degree +
-             perc_non_citizen + gini_index + perc_non_citizen , data=crimes)
+res1 <- lm(hate_crimes_per_100k_splc ~. -state, data=crimes)
 
 summary(res1)
+```
+
+## box cox
+
+```{r}
+boxcox(res1)
+```
+
+lamda =0, get maximum likelihood, so the outcome should be applied to log transformation.
+
+```{r}
+crime_log = 
+  crimes %>%
+  mutate(ln_hate_crime_outcome = log(hate_crimes_per_100k_splc, base = exp(1))) 
+  
+fit2 = 
+  lm(ln_hate_crime_outcome ~ . -state -hate_crimes_per_100k_splc , data = crime_log)
+summary(fit2)
+
+```
+
+## Identify Collinearity
+```{r}
+# Calculate the variance inflation factor (VIF)
+vif(fit2)
+```
+no VIF higher than 5, nothing should be remove because of collinearity
+
+## check for outliers
+
+remove 7 and 9
+```{r}
+
+# Measures of influence:
+# Gives DFFITS, Cook's Distance, Hat diagonal elements, and others.
+
+influence.measures(fit2)
+
+# Look at the Cook's distance lines and notice obs 36 and 29 as potential Y outliers/influential points
+
+par(mfrow=c(2,2))
+plot(fit2)
+
+
+# Remove observations 36 and 29
+crime_log_rm_36_29_9<-crime_log[c(-36,-29, -9),]
+mult.fit_no36_29_9<- lm(ln_hate_crime_outcome ~ . -state -hate_crimes_per_100k_splc, data = crime_log_rm_36_29_9)
+
+summary(mult.fit_no36_29_9)
+
+influence.measures(mult.fit_no36_29_9)
+
+par(mfrow=c(2,2))
+plot(mult.fit_no36_29_9)
 ```
 
