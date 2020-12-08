@@ -193,7 +193,7 @@ plot(final_fit2)
 
 # Remove observations 9
 crime_log_rm_9<-crime_log[c(-9),]
-mult.fit_no9<- lm(ln_hate_crime_outcome ~ . -state -hate_crimes_per_100k_splc, data = crime_log_rm_9)
+mult.fit_no9<- lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index , data = crime_log_rm_9)
 
 summary(mult.fit_no9)
 
