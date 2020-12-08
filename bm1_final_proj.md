@@ -64,11 +64,11 @@ BM1 final project
     ## |-  Min - Max                                             |     0.06 - 0.81     |
     ## |-  Missing                                               |          0          |
 
-<img src="bm1_final_proj_files/figure-gfm/unnamed-chunk-2-1.png" width="90%" />
+![](bm1_final_proj_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ## Varible Selection
 
-<img src="bm1_final_proj_files/figure-gfm/unnamed-chunk-3-1.png" width="90%" />
+![](bm1_final_proj_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
     ##                                         median_household_income
     ## median_household_income                                    1.00
@@ -160,7 +160,7 @@ summary(res1)
 boxcox(res1)
 ```
 
-<img src="bm1_final_proj_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
+![](bm1_final_proj_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 lamda =0, get maximum likelihood, so the outcome should be applied to
 log transformation.
@@ -343,7 +343,7 @@ par(mfrow=c(2,2))
 plot(fit2)
 ```
 
-<img src="bm1_final_proj_files/figure-gfm/unnamed-chunk-8-1.png" width="90%" />
+![](bm1_final_proj_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 # Remove observations 36 and 29
@@ -488,4 +488,4 @@ par(mfrow=c(2,2))
 plot(mult.fit_no36_29_9)
 ```
 
-<img src="bm1_final_proj_files/figure-gfm/unnamed-chunk-8-2.png" width="90%" />
+![](bm1_final_proj_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
