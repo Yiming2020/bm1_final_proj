@@ -1,6 +1,10 @@
 ---
 title: "BM1 final project"
-output: github_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
 ---
 
 ```{r setup, include = FALSE}
