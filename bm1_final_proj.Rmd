@@ -92,11 +92,11 @@ median_household_income and perc_population_with_high_school_degree may highly c
 perc_non_white and perc_non_cizen may highly correlated.
 
 ```{r}
-# 2. Simple linear regression model: hate crime rates~ median household income
-ggplot(data=crimes,aes(x=median_household_income,y=hate_crimes_per_100k_splc))+
-geom_point(color="blue",alpha=0.5) +geom_smooth(method="lm",se=F,color="pink")+labs(title="Plot of Hate Crimes Rate By Median Household Income ",y="Hate Crimes Rate (Per 100 K Population)", x = "Median Household Income")+mytheme
-res_crimes_income<-lm(hate_crimes_per_100k_splc~median_household_income,data=crimes)
-summary(res_crimes_income)
+# 2. Simple linear regression model: hate crime rates~ gini index
+ggplot(data=crimes,aes(x=gini_index,y=hate_crimes_per_100k_splc))+
+geom_point(color="blue",alpha=0.5) +geom_smooth(method="lm",se=F,color="pink")+labs(title="Plot of Hate Crimes Rate By Gini Index",y="Hate Crimes Rate (Per 100 K Population)", x = "Gini Index")+mytheme
+res_crimes_gini<-lm(hate_crimes_per_100k_splc~gini_index,data=crimes)
+summary(res_crimes_gini)
 
 # 3. Varibale Selection- backwards selection
 res1 <- lm(hate_crimes_per_100k_splc ~ .-state, data=crimes)
@@ -108,13 +108,16 @@ summary(step1)
 step2<-update(step1, . ~ . -unemployment)
 summary(step2)
 
-step3<-update(step2, . ~ . -urbanization) # since median_household income is the primary predictor, keep it
+step3<-update(step2, . ~ . -median_household_income) 
 summary(step3)
 
-step4<-update(step3, . ~ . -perc_non_citizen)
+step4<-update(step3, . ~ . -perc_non_citizen) 
 summary(step4)
 
-multi_fit1<-lm(hate_crimes_per_100k_splc~median_household_income+perc_population_with_high_school_degree+gini_index,data=crimes)
+step5<-update(step4, . ~ . -urbanization)
+summary(step5)
+
+multi_fit1<-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index,data=crimes)
 summary(multi_fit1)
 
 # 4. Criterion Selection
@@ -129,22 +132,21 @@ best <- function(model, ...)
 
 
 round(best(multi_fit1, nbest = 1), 3) # chose model2 with the minimum cp, BIC and highest adjusted R2
-multi_fit2<-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index,data=crimes)
-summary(multi_fit2)
 
-# 5. Check interactions between median income and perc of highschool degree
+# 5. Check interactions between median income and perc of high school degree
 res_interaction<-lm(hate_crimes_per_100k_splc~median_household_income*perc_population_with_high_school_degree+gini_index,data=crimes)
 summary(res_interaction) # No-interaction between income and high school degree
 
 # Check interactions between urbanization and gini_index
 ggplot(data=crimes,aes(x=gini_index,y=hate_crimes_per_100k_splc,color=urbanization))+
-geom_point() +geom_smooth(method="lm",se=F)+labs(title="Plot of Hate Crimes Rate vs Gini index By Urbanization level ",y="Hate Crimes Rate (Per 100 K Population)", x = "Gini index")+ mytheme
+geom_point() +geom_smooth(method="lm",se=F)+labs(title="Plot of Hate Crimes Rate vs Gini index By Urbanization level ",y="Hate Crimes Rate (Per 100 K Population)", x = "Gini index")+mytheme
 res_interaction2<-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index*urbanization,data=crimes)
 summary(res_interaction2) # No interaction b/w urbanization and gini index
 ```
+```
 
-
-##final model(complete variables selection)
+## Model Diagnosis
+### check assumption， final model(finish variables selection)
 ```{r}
 final_fit = lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index,data=crimes)
 summary(final_fit)
@@ -157,7 +159,7 @@ plot(final_fit) # need transformation
 ### box cox
 
 ```{r}
-boxcox(final_fit)
+boxcox(final_fit) # use natural log transformation
 ```
 
 lamda =0, get maximum likelihood, so the outcome should be applied to log transformation.
