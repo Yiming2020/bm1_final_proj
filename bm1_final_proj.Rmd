@@ -15,6 +15,7 @@ library(dplyr)
 library(ggplot2)
 library(HH)
 library(leaps)
+library(jtools)
 
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -133,17 +134,56 @@ best <- function(model, ...)
 
 round(best(multi_fit1, nbest = 1), 3) # chose model2 with the minimum cp, BIC and highest adjusted R2
 
+```
+
+### just one step to get best fit.
+```{r}
+crimes = 
+  crimes %>% 
+  subset(select = c(-state))
+
+model_fit = 
+  lm(hate_crimes_per_100k_splc ~., data = crimes) %>% 
+  step(direction = "both")
+summary(model_fit)
+```
+
+### interaction
+
+```{r}
 # 5. Check interactions between median income and perc of high school degree
 res_interaction<-lm(hate_crimes_per_100k_splc~median_household_income*perc_population_with_high_school_degree+gini_index,data=crimes)
 summary(res_interaction) # No-interaction between income and high school degree
+anova(model_fit, res_interaction)
+
+#--------------------------------------------------------------------------------------------------------
 
 # Check interactions between urbanization and gini_index
 ggplot(data=crimes,aes(x=gini_index,y=hate_crimes_per_100k_splc,color=urbanization))+
 geom_point() +geom_smooth(method="lm",se=F)+labs(title="Plot of Hate Crimes Rate vs Gini index By Urbanization level ",y="Hate Crimes Rate (Per 100 K Population)", x = "Gini index")+mytheme
+
+
+
 res_interaction2<-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index*urbanization,data=crimes)
 summary(res_interaction2) # No interaction b/w urbanization and gini index
+
+anova(model_fit, res_interaction2)
+##This p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index
 ```
+
+### find confounder
+
+```{r}
+reg_conf1 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + unemployment, data=crimes)
+summary(model_fit)
+summary(reg_conf1) ### coefficient changes for gini and high school degree is smaller than 1%, unemployment is not a confounder
+
+reg_conf2 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + urbanization, data=crimes)
+summary(model_fit)
+summary(reg_conf2) ### coefficient changes for gini and high school degree is smaller than 1%, urbanization is not a confounder
+
 ```
+
 
 ## Model Diagnosis
 ### check assumption， final model(finish variables selection)
@@ -159,7 +199,7 @@ plot(final_fit) # need transformation
 ### box cox
 
 ```{r}
-boxcox(final_fit) # use natural log transformation
+boxcox(final_fit)  # use natural log transformation
 ```
 
 lamda =0, get maximum likelihood, so the outcome should be applied to log transformation.
