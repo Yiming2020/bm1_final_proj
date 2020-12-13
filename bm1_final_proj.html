@@ -2181,7 +2181,53 @@ summary(res_interaction2) # No interaction b/w urbanization and gini index</code
 ##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
 ## 1     42 1.5270                           
 ## 2     40 1.5245  2 0.0025408 0.0333 0.9672</code></pre>
-<p>The anova p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index. (do not just copy this sentence, paraphrase it)</p>
+<pre class="r"><code>###  Check interactions between perc_non_white and gini_index
+
+res_interaction3&lt;-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index*perc_non_white,data=crimes)
+summary(res_interaction3) </code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index * perc_non_white, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.29375 -0.14150  0.00895  0.07453  0.50715 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                               -2.453      2.317  -1.059 0.296006
+## perc_population_with_high_school_degree    3.935      1.089   3.615 0.000832
+## gini_index                                -1.560      3.757  -0.415 0.680128
+## perc_non_white                           -10.655      3.597  -2.962 0.005120
+## gini_index:perc_non_white                 23.502      7.851   2.993 0.004712
+##                                            
+## (Intercept)                                
+## perc_population_with_high_school_degree ***
+## gini_index                                 
+## perc_non_white                          ** 
+## gini_index:perc_non_white               ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1763 on 40 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.5535, Adjusted R-squared:  0.5088 
+## F-statistic:  12.4 on 4 and 40 DF,  p-value: 1.197e-06</code></pre>
+<pre class="r"><code>anova(model_fit, res_interaction3)#exist interaction b/w perc_non_white and gini index</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index
+## Model 2: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index * perc_non_white
+##   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
+## 1     42 1.5270                              
+## 2     40 1.2433  2   0.28374 4.5643 0.01639 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The anova p-value of potential interaction between urbanization and gini index,and median income and perc of high school degree turn out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index. (do not just copy this sentence, paraphrase it)</p>
+<p>There is an significant interaction between perc_non_white and gini index</p>
 </div>
 <div id="find-confounder" class="section level3">
 <h3>find confounder</h3>
