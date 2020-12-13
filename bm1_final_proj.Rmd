@@ -145,7 +145,7 @@ crimes =
 model_fit = 
   lm(hate_crimes_per_100k_splc ~., data = crimes) %>% 
   step(direction = "both")
-summary(model_fit)
+summary(model_fit)   ### get same model with Mumei
 ```
 
 ### interaction
@@ -168,8 +168,10 @@ res_interaction2<-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_
 summary(res_interaction2) # No interaction b/w urbanization and gini index
 
 anova(model_fit, res_interaction2)
-##This p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index
+
 ```
+The anova p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index. (do not just copy this sentence, paraphrase it)
+
 
 ### find confounder
 
@@ -182,8 +184,20 @@ reg_conf2 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree
 summary(model_fit)
 summary(reg_conf2) ### coefficient changes for gini and high school degree is smaller than 1%, urbanization is not a confounder
 
+reg_conf3 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + median_household_income, data=crimes)
+summary(model_fit)
+summary(reg_conf3)
+
+reg_conf4 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_citizen, data=crimes)
+summary(model_fit)
+summary(reg_conf4) # 5% coefficient change for gini_index
+
+reg_conf5 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_white, data=crimes)
+summary(model_fit)
+summary(reg_conf5)
 ```
 
+coefficient changes for gini and high school degree is smaller than 1%, none of other variables are confounders
 
 ## Model Diagnosis
 ### check assumption， final model(finish variables selection)

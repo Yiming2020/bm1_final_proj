@@ -2048,7 +2048,7 @@ model_fit =
 ## + urbanization                             1   0.00001 1.5270 -144.25
 ## - perc_population_with_high_school_degree  1   0.85432 2.3813 -128.25
 ## - gini_index                               1   1.06513 2.5922 -124.44</code></pre>
-<pre class="r"><code>summary(model_fit)</code></pre>
+<pre class="r"><code>summary(model_fit)   ### get same model with Mumei</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
@@ -2181,7 +2181,7 @@ summary(res_interaction2) # No interaction b/w urbanization and gini index</code
 ##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
 ## 1     42 1.5270                           
 ## 2     40 1.5245  2 0.0025408 0.0333 0.9672</code></pre>
-<pre class="r"><code>##This p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index</code></pre>
+<p>The anova p-value turns out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index. (do not just copy this sentence, paraphrase it)</p>
 </div>
 <div id="find-confounder" class="section level3">
 <h3>find confounder</h3>
@@ -2295,6 +2295,172 @@ summary(model_fit)</code></pre>
 ##   (3 observations deleted due to missingness)
 ## Multiple R-squared:  0.4516, Adjusted R-squared:  0.4115 
 ## F-statistic: 11.25 on 3 and 41 DF,  p-value: 1.61e-05</code></pre>
+<pre class="r"><code>reg_conf3 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + median_household_income, data=crimes)
+summary(model_fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33490 -0.11891 -0.03105  0.11430  0.52418 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                               -8.103      1.447  -5.601 1.48e-06
+## perc_population_with_high_school_degree    5.059      1.044   4.847 1.74e-05
+## gini_index                                 8.825      1.630   5.413 2.76e-06
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## gini_index                              ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1907 on 42 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4516, Adjusted R-squared:  0.4255 
+## F-statistic: 17.29 on 2 and 42 DF,  p-value: 3.32e-06</code></pre>
+<pre class="r"><code>summary(reg_conf3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index + median_household_income, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33932 -0.12201 -0.02784  0.11448  0.52305 
+## 
+## Coefficients:
+##                                           Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                             -7.979e+00  1.723e+00  -4.630 3.65e-05
+## perc_population_with_high_school_degree  4.920e+00  1.469e+00   3.349  0.00175
+## gini_index                               8.743e+00  1.757e+00   4.976 1.21e-05
+## median_household_income                  6.158e-07  4.546e-06   0.135  0.89290
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ** 
+## gini_index                              ***
+## median_household_income                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1929 on 41 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4518, Adjusted R-squared:  0.4117 
+## F-statistic: 11.27 on 3 and 41 DF,  p-value: 1.596e-05</code></pre>
+<pre class="r"><code>reg_conf4 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_citizen, data=crimes)
+summary(model_fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33490 -0.11891 -0.03105  0.11430  0.52418 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                               -8.103      1.447  -5.601 1.48e-06
+## perc_population_with_high_school_degree    5.059      1.044   4.847 1.74e-05
+## gini_index                                 8.825      1.630   5.413 2.76e-06
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## gini_index                              ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1907 on 42 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4516, Adjusted R-squared:  0.4255 
+## F-statistic: 17.29 on 2 and 42 DF,  p-value: 3.32e-06</code></pre>
+<pre class="r"><code>summary(reg_conf4) # 5% coefficient change for gini_index</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index + perc_non_citizen, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.36746 -0.10713 -0.01483  0.09552  0.52395 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                              -7.9264     1.4835  -5.343 3.70e-06
+## perc_population_with_high_school_degree   5.0624     1.0511   4.816 2.02e-05
+## gini_index                                8.3497     1.8065   4.622 3.75e-05
+## perc_non_citizen                          0.6672     1.0567   0.631    0.531
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## gini_index                              ***
+## perc_non_citizen                           
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1921 on 41 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4569, Adjusted R-squared:  0.4171 
+## F-statistic:  11.5 on 3 and 41 DF,  p-value: 1.327e-05</code></pre>
+<pre class="r"><code>reg_conf5 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_white, data=crimes)
+summary(model_fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33490 -0.11891 -0.03105  0.11430  0.52418 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                               -8.103      1.447  -5.601 1.48e-06
+## perc_population_with_high_school_degree    5.059      1.044   4.847 1.74e-05
+## gini_index                                 8.825      1.630   5.413 2.76e-06
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## gini_index                              ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1907 on 42 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4516, Adjusted R-squared:  0.4255 
+## F-statistic: 17.29 on 2 and 42 DF,  p-value: 3.32e-06</code></pre>
+<pre class="r"><code>summary(reg_conf5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index + perc_non_white, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.34482 -0.11894 -0.01934  0.09334  0.51477 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                             -8.11630    1.46202  -5.551 1.88e-06
+## perc_population_with_high_school_degree  5.17627    1.10015   4.705 2.88e-05
+## gini_index                               8.56713    1.78501   4.799 2.13e-05
+## perc_non_white                           0.09139    0.24373   0.375     0.71
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## gini_index                              ***
+## perc_non_white                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1927 on 41 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4535, Adjusted R-squared:  0.4135 
+## F-statistic: 11.34 on 3 and 41 DF,  p-value: 1.504e-05</code></pre>
+<p>coefficient changes for gini and high school degree is smaller than 1%, none of other variables are confounders</p>
 </div>
 </div>
 <div id="model-diagnosis" class="section level2">
