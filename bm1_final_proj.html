@@ -2078,12 +2078,12 @@ model_fit =
 <div id="interaction" class="section level3">
 <h3>interaction</h3>
 <pre class="r"><code># 5. Check interactions between median income and perc of high school degree
-res_interaction&lt;-lm(hate_crimes_per_100k_splc~median_household_income*perc_population_with_high_school_degree+gini_index,data=crimes)
+res_interaction&lt;-lm(hate_crimes_per_100k_splc ~ gini_index + perc_population_with_high_school_degree * median_household_income ,data=crimes)
 summary(res_interaction) # No-interaction between income and high school degree</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = hate_crimes_per_100k_splc ~ median_household_income * 
-##     perc_population_with_high_school_degree + gini_index, data = crimes)
+## lm(formula = hate_crimes_per_100k_splc ~ gini_index + perc_population_with_high_school_degree * 
+##     median_household_income, data = crimes)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -2092,28 +2092,28 @@ summary(res_interaction) # No-interaction between income and high school degree<
 ## Coefficients:
 ##                                                                   Estimate
 ## (Intercept)                                                     -7.067e+00
-## median_household_income                                         -1.707e-05
-## perc_population_with_high_school_degree                          3.837e+00
 ## gini_index                                                       8.801e+00
-## median_household_income:perc_population_with_high_school_degree  2.033e-05
+## perc_population_with_high_school_degree                          3.837e+00
+## median_household_income                                         -1.707e-05
+## perc_population_with_high_school_degree:median_household_income  2.033e-05
 ##                                                                 Std. Error
 ## (Intercept)                                                      5.725e+00
-## median_household_income                                          1.058e-04
-## perc_population_with_high_school_degree                          6.643e+00
 ## gini_index                                                       1.811e+00
-## median_household_income:perc_population_with_high_school_degree  1.215e-04
+## perc_population_with_high_school_degree                          6.643e+00
+## median_household_income                                          1.058e-04
+## perc_population_with_high_school_degree:median_household_income  1.215e-04
 ##                                                                 t value
 ## (Intercept)                                                      -1.234
-## median_household_income                                          -0.161
-## perc_population_with_high_school_degree                           0.578
 ## gini_index                                                        4.859
-## median_household_income:perc_population_with_high_school_degree   0.167
+## perc_population_with_high_school_degree                           0.578
+## median_household_income                                          -0.161
+## perc_population_with_high_school_degree:median_household_income   0.167
 ##                                                                 Pr(&gt;|t|)    
 ## (Intercept)                                                        0.224    
-## median_household_income                                            0.873    
-## perc_population_with_high_school_degree                            0.567    
 ## gini_index                                                      1.86e-05 ***
-## median_household_income:perc_population_with_high_school_degree    0.868    
+## perc_population_with_high_school_degree                            0.567    
+## median_household_income                                            0.873    
+## perc_population_with_high_school_degree:median_household_income    0.868    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
@@ -2126,8 +2126,8 @@ summary(res_interaction) # No-interaction between income and high school degree<
 ## 
 ## Model 1: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
 ##     gini_index
-## Model 2: hate_crimes_per_100k_splc ~ median_household_income * perc_population_with_high_school_degree + 
-##     gini_index
+## Model 2: hate_crimes_per_100k_splc ~ gini_index + perc_population_with_high_school_degree * 
+##     median_household_income
 ##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
 ## 1     42 1.5270                           
 ## 2     40 1.5253  2 0.0017498 0.0229 0.9773</code></pre>
@@ -2226,6 +2226,135 @@ summary(res_interaction3) </code></pre>
 ## 2     40 1.2433  2   0.28374 4.5643 0.01639 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>###  Check interactions between high school degree and unemployment
+
+res_interaction4&lt;-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree*unemployment+gini_index,data=crimes)
+summary(res_interaction4) </code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree * 
+##     unemployment + gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33849 -0.12104 -0.01794  0.08728  0.52861 
+## 
+## Coefficients:
+##                                                          Estimate Std. Error
+## (Intercept)                                               -7.5653     1.8667
+## perc_population_with_high_school_degree                    4.5052     1.5606
+## unemploymenthigh                                          -0.8169     1.7905
+## gini_index                                                 8.7249     1.7498
+## perc_population_with_high_school_degree:unemploymenthigh   0.9303     2.0695
+##                                                          t value Pr(&gt;|t|)    
+## (Intercept)                                               -4.053 0.000227 ***
+## perc_population_with_high_school_degree                    2.887 0.006247 ** 
+## unemploymenthigh                                          -0.456 0.650663    
+## gini_index                                                 4.986 1.24e-05 ***
+## perc_population_with_high_school_degree:unemploymenthigh   0.450 0.655484    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1948 on 40 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4548, Adjusted R-squared:  0.4003 
+## F-statistic: 8.343 on 4 and 40 DF,  p-value: 5.429e-05</code></pre>
+<pre class="r"><code>anova(model_fit, res_interaction4)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index
+## Model 2: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree * 
+##     unemployment + gini_index
+##   Res.Df   RSS Df Sum of Sq     F Pr(&gt;F)
+## 1     42 1.527                          
+## 2     40 1.518  2 0.0090294 0.119 0.8882</code></pre>
+<pre class="r"><code>###  Check interactions between gini index and unemployment
+
+res_interaction4&lt;-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree + unemployment*gini_index,data=crimes)
+summary(res_interaction4) </code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     unemployment * gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.33987 -0.11332 -0.03509  0.10440  0.49773 
+## 
+## Coefficients:
+##                                         Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)                               -7.209      1.880  -3.835 0.000435
+## perc_population_with_high_school_degree    4.750      1.161   4.092 0.000201
+## unemploymenthigh                          -1.105      1.466  -0.754 0.455472
+## gini_index                                 7.444      2.585   2.880 0.006366
+## unemploymenthigh:gini_index                2.391      3.206   0.746 0.460156
+##                                            
+## (Intercept)                             ***
+## perc_population_with_high_school_degree ***
+## unemploymenthigh                           
+## gini_index                              ** 
+## unemploymenthigh:gini_index                
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.194 on 40 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.4596, Adjusted R-squared:  0.4056 
+## F-statistic: 8.505 on 4 and 40 DF,  p-value: 4.598e-05</code></pre>
+<pre class="r"><code>anova(model_fit, res_interaction4)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index
+## Model 2: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     unemployment * gini_index
+##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     42 1.5270                           
+## 2     40 1.5047  2  0.022284 0.2962 0.7453</code></pre>
+<pre class="r"><code># Check interactions between urbanization and high school degree
+
+res_interaction5&lt;-lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree*urbanization+gini_index,data=crimes)
+summary(res_interaction5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree * 
+##     urbanization + gini_index, data = crimes)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.35046 -0.11968 -0.03168  0.08257  0.53168 
+## 
+## Coefficients:
+##                                                          Estimate Std. Error
+## (Intercept)                                                -7.272      1.744
+## perc_population_with_high_school_degree                     4.230      1.367
+## urbanizationhigh                                           -1.527      1.593
+## gini_index                                                  8.581      1.830
+## perc_population_with_high_school_degree:urbanizationhigh    1.768      1.842
+##                                                          t value Pr(&gt;|t|)    
+## (Intercept)                                               -4.171 0.000159 ***
+## perc_population_with_high_school_degree                    3.093 0.003601 ** 
+## urbanizationhigh                                          -0.959 0.343528    
+## gini_index                                                 4.689 3.17e-05 ***
+## perc_population_with_high_school_degree:urbanizationhigh   0.960 0.342792    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1932 on 40 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.464,  Adjusted R-squared:  0.4103 
+## F-statistic: 8.655 on 4 and 40 DF,  p-value: 3.945e-05</code></pre>
+<pre class="r"><code>anova(model_fit, res_interaction5)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + 
+##     gini_index
+## Model 2: hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree * 
+##     urbanization + gini_index
+##   Res.Df    RSS Df Sum of Sq     F Pr(&gt;F)
+## 1     42 1.5270                          
+## 2     40 1.4926  2  0.034406 0.461  0.634</code></pre>
 <p>The anova p-value of potential interaction between urbanization and gini index,and median income and perc of high school degree turn out to not be statistically significant. So even though the estimated slopes in the interaction model look very different, our estimates are quite variable, so we don’t have enough evidence to conclude that the interaction term (different slopes) is providing significant additional explanatory power over the simpler perc_population_with_high_school_degree+gini_index. (do not just copy this sentence, paraphrase it)</p>
 <p>There is an significant interaction between perc_non_white and gini index</p>
 </div>
