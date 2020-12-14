@@ -305,6 +305,7 @@ plot(mult.fit_no9)
 
 ```{r}
 
+set.seed(2)
 cv_df = 
   crossv_mc(crime_log_rm_9, 100)
 
