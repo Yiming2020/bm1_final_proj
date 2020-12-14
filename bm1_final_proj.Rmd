@@ -15,6 +15,8 @@ library(ggplot2)
 library(HH)
 library(leaps)
 library(jtools)
+library(modelr)
+library(mgcv)
 
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -299,5 +301,43 @@ plot(mult.fit_no9)
 
 
 
+### Cross validation
+
+```{r}
+
+cv_df = 
+  crossv_mc(crime_log_rm_9, 100)
+
+cv_df =
+  cv_df %>% 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+
+cv_df = 
+  cv_df %>% 
+  mutate(
+    mode_tran_nointer  = 
+      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index, data = .x)),
+    mode_tran_inter  = 
+      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x)),
+    mode_inter  = 
+      map(.x = train, ~lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x))
+    ) %>% 
+  mutate(
+    rmse_tran_nointer = map2_dbl(.x = mode_tran_nointer, .y = test, ~rmse(model = .x, data = .y)),
+    rmse_tran_inter = map2_dbl(.x = mode_tran_inter, .y = test, ~rmse(model = .x, data = .y)),
+    rmse_inter = map2_dbl(.x = mode_inter, .y = test, ~rmse(model = .x, data = .y)))
+
+cv_df %>% 
+  dplyr::select(starts_with("rmse")) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  mutate(model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()
+```
 
 
