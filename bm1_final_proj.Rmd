@@ -302,86 +302,7 @@ plot(mult.fit_no9)
 
 
 
-### Cross validation
 
-data set removes point9
-```{r}
-
-set.seed(2)
-cv_df = 
-  crossv_mc(crime_log_rm_9, 100)
-
-cv_df =
-  cv_df %>% 
-  mutate(
-    train = map(train, as_tibble),
-    test = map(test, as_tibble))
-
-cv_df = 
-  cv_df %>% 
-  mutate(
-    mode_tran_nointer  = 
-      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index, data = .x)),
-    mode_tran_inter  = 
-      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x)),
-    mode_inter  = 
-      map(.x = train, ~lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x))
-    ) %>% 
-  mutate(
-    rmse_tran_nointer = map2_dbl(.x = mode_tran_nointer, .y = test, ~rmse(model = .x, data = .y)),
-    rmse_tran_inter = map2_dbl(.x = mode_tran_inter, .y = test, ~rmse(model = .x, data = .y)),
-    rmse_inter = map2_dbl(.x = mode_inter, .y = test, ~rmse(model = .x, data = .y)))
-
-cv_df %>% 
-  dplyr::select(starts_with("rmse")) %>% 
-  pivot_longer(
-    everything(),
-    names_to = "model", 
-    values_to = "rmse",
-    names_prefix = "rmse_") %>% 
-  mutate(model = fct_inorder(model)) %>% 
-  ggplot(aes(x = model, y = rmse)) + geom_violin()
-```
-
-
-
-data set doesn't remove point9
-```{r}
-set.seed(3)
-cv_df = 
-  crossv_mc(crime_log, 100)
-
-cv_df =
-  cv_df %>% 
-  mutate(
-    train = map(train, as_tibble),
-    test = map(test, as_tibble))
-
-cv_df = 
-  cv_df %>% 
-  mutate(
-    mode_tran_nointer  = 
-      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index, data = .x)),
-    mode_tran_inter  = 
-      map(.x = train, ~lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x)),
-    mode_inter  = 
-      map(.x = train, ~lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index*perc_non_white, data = .x))
-    ) %>% 
-  mutate(
-    rmse_tran_nointer = map2_dbl(.x = mode_tran_nointer, .y = test, ~rmse(model = .x, data = .y)),
-    rmse_tran_inter = map2_dbl(.x = mode_tran_inter, .y = test, ~rmse(model = .x, data = .y)),
-    rmse_inter = map2_dbl(.x = mode_inter, .y = test, ~rmse(model = .x, data = .y)))
-
-cv_df %>% 
-  dplyr::select(starts_with("rmse")) %>% 
-  pivot_longer(
-    everything(),
-    names_to = "model", 
-    values_to = "rmse",
-    names_prefix = "rmse_") %>% 
-  mutate(model = fct_inorder(model)) %>% 
-  ggplot(aes(x = model, y = rmse)) + geom_violin()
-```
 
 
 
@@ -504,7 +425,9 @@ summary(reg_conf1) ### coefficient changes for gini and high school degree is sm
 
 reg_conf2 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + urbanization, data=crimes)
 summary(model_fit)
-summary(reg_conf2) ###  urbanization is  a confounder
+summary(reg_conf2) 
+reg_urb = lm(hate_crimes_per_100k_splc~urbanization, data=crimes)
+summary(reg_urb)###  urbanization is not  a confounder
 
 reg_conf3 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + median_household_income, data=crimes)
 summary(model_fit)
@@ -512,35 +435,23 @@ summary(reg_conf3)
 
 reg_conf4 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_citizen, data=crimes)
 summary(model_fit)
-summary(reg_conf4) # perc_non_citizen is a confounder
+summary(reg_conf4) 
+reg_noncit = lm(hate_crimes_per_100k_splc~perc_non_citizen, data=crimes)
+summary(reg_noncit)# perc_non_citizen is not a confounder
 
 reg_conf5 = lm(hate_crimes_per_100k_splc~perc_population_with_high_school_degree+gini_index + perc_non_white, data=crimes)
 summary(model_fit)
 summary(reg_conf5)
 ```
-
-urbanization and perc_non_citizen  are confounders
+No confounders
 
 ## Model Diagnosis
 ### check assumption， final model(finish variables selection)
 ```{r}
-crime_urhigh = 
-  crimes %>% 
-  filter(urbanization == "high")
-
-crime_urlow = 
-  crimes %>% 
-  filter(urbanization == "low")
-
-final_fit_urhigh = lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index,data=crime_urhigh)
-summary(final_fit_urhigh)
+final_fit11 = lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index,data=crimes)
+summary(final_fit11)
 par(mfrow=c(2,2))
-plot(final_fit_urhigh) # need transformation
-
-final_fit_urlow = lm(hate_crimes_per_100k_splc ~ perc_population_with_high_school_degree + gini_index,data=crime_urlow)
-summary(final_fit_urlow)
-par(mfrow=c(2,2))
-plot(final_fit_urlow)
+plot(final_fit11) # need transformation
 ```
 
 
@@ -548,35 +459,26 @@ plot(final_fit_urlow)
 ### box cox
 
 ```{r}
-boxcox(final_fit_urhigh)  # use natural log transformation
-boxcox(final_fit_urlow) 
+boxcox(final_fit11)  # use natural log transformation
 ```
 
 lamda =0, get maximum likelihood, so the outcome should be applied to log transformation.
 
 ```{r}
-crime_log_urhigh = 
-  crime_urhigh %>%
+crime_log = 
+  crimes %>%
   mutate(ln_hate_crime_outcome = log(hate_crimes_per_100k_splc, base = exp(1))) 
   
-final_fit2_urhigh = 
-  lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index , data = crime_log_urhigh)
-summary(final_fit2_urhigh)
-##############################
-crime_log_urlow = 
-  crime_urlow %>%
-  mutate(ln_hate_crime_outcome = log(hate_crimes_per_100k_splc, base = exp(1))) 
-  
-final_fit2_urlow = 
-  lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index , data = crime_log_urlow)
-summary(final_fit2_urlow)
+final_fit22 = 
+  lm(ln_hate_crime_outcome ~ perc_population_with_high_school_degree + gini_index , data = crime_log)
+summary(final_fit22)
+
 ```
 
 ### Identify Collinearity
 ```{r}
 # Calculate the variance inflation factor (VIF)
-vif(final_fit2_urhigh)
-vif(final_fit2_urlow)
+vif(final_fit2)
 ```
 no VIF higher than 5, nothing should be removed because of collinearity
 
@@ -587,19 +489,12 @@ no VIF higher than 5, nothing should be removed because of collinearity
 # Measures of influence:
 # Gives DFFITS, Cook's Distance, Hat diagonal elements, and others.
 
-influence.measures(final_fit2_urhigh)
+influence.measures(final_fit22)
 
 # Look at the Cook's distance lines and notice obs 36 and 29 as potential Y outliers/influential points
 
 par(mfrow=c(2,2))
-plot(final_fit2_urhigh)
-
-
-par(mfrow=c(2,2))
-plot(final_fit2_urlow)
-
+plot(final_fit22)
 
 ```
-
-
 
